@@ -30,19 +30,17 @@ namespace csc485b {
              * @pre The pointers in DenseGraph g have already been allocated.
              */
             __global__
-                void build_graph(DenseGraph g, edge_t const* edge_list, std::size_t m)
-
+                void build_graph(DenseGraph g, std::size_t m)
             {
                 // IMPLEMENT ME!
                 return;
             }
 
-
             __device__
-                void matrix_mult(int *adj_mat, int n) {
+                void matrix_mult(int* adj_mat, int n) {
 
 
-                
+
                 const int tiling_size = 2;
 
                 __shared__ int vert_smem[tiling_size][tiling_size];
@@ -76,7 +74,7 @@ namespace csc485b {
                         __syncthreads();
                     }
                 }
-                
+
                 adj_mat[row * n + col] = temp;
             }
 
@@ -87,8 +85,8 @@ namespace csc485b {
             __global__
                 void two_hop_reachability(DenseGraph g)
             {
-                matrix_mult(g.adjacencyMatrix, g.n);
 
+                matrix_mult(g.adjacencyMatrix, g.n);
                 // IMPLEMENT ME!
                 // square adjacencyMatrix
                 // then remove the diagonal and clamp values back to [0,1]

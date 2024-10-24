@@ -1,0 +1,30 @@
+ std::vector<int> matrix_nodes = 
+        {0, 1, 1, 0,
+         1, 0, 0, 0,
+         1, 0, 0, 1,
+         0, 0, 1, 0
+    };
+    std::vector<int> matrix_out(matrix_nodes.size(), -1);
+
+    csc485b::a2::node_t* d_matrix_out;
+
+    csc485b::a2::node_t* d_matrix;
+    cudaMalloc((void**)&d_matrix, sizeof(int) * matrix_nodes.size());
+    cudaMemcpy(d_matrix, matrix_nodes.data(), sizeof(int) * matrix_nodes.size(), cudaMemcpyHostToDevice);
+    
+    cudaMalloc((void**)&d_matrix_out, sizeof(int) * matrix_out.size());
+    cudaMemcpy(d_matrix_out, matrix_out.data(), sizeof(int) * matrix_out.size(), cudaMemcpyHostToDevice);
+
+    unsigned int matrix_size = sqrt(matrix_nodes.size());
+    unsigned int num_block = matrix_size / tiling_size;
+
+    std::cout << "number of blocks: " << num_block << std::endl;
+    std::cout << "width: " << matrix_size << std::endl;
+
+    csc485b::a2::DenseGraph d_dg{ n, d_matrix };
+    csc485b::a2::gpu::two_hop_reachability << < {num_block, num_block}, {tiling_size, tiling_size } >> > (d_dg);
+
+    cudaMemcpy(matrix_out.data(), d_matrix_out, sizeof(int) * matrix_out.size(), cudaMemcpyDeviceToHost);
+    cudaMemcpy(matrix_nodes.data(), d_matrix, sizeof(int) * matrix_nodes.size(), cudaMemcpyDeviceToHost);
+
+    print_matrix(matrix_nodes.data(), matrix_size, matrix_size);

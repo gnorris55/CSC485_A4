@@ -1,12 +1,15 @@
 
-#include <cstddef>  // std::size_t type
+#include <chrono>   // for timing
 #include <iostream> // std::cout, std::endl
+#include <iterator> // std::ostream_iterator
 #include <vector>
 
-#include "algorithm_choices.h"
+#include "dense_graph.h"
+#include "sparse_graph.h"
+
 #include "data_generator.h"
 #include "data_types.h"
-<<<<<<< Updated upstream
+
 #include "cuda_common.h"
 =======
 
@@ -22,6 +25,7 @@ void print_matrix(T* matrix, int m, int n) {
         std::cout << "|" << std::endl;
     }
 }
+
 /**
  * Runs timing tests on a CUDA graph implementation.
  * Consists of independently constructing the graph and then
@@ -30,7 +34,7 @@ void print_matrix(T* matrix, int m, int n) {
 template < typename DeviceGraph >
 void run(DeviceGraph g, csc485b::a2::edge_t const* d_edges, std::size_t m)
 {
-    
+
     cudaDeviceSynchronize();
     auto const build_start = std::chrono::high_resolution_clock::now();
 
@@ -39,6 +43,7 @@ void run(DeviceGraph g, csc485b::a2::edge_t const* d_edges, std::size_t m)
 
     cudaDeviceSynchronize();
     auto const reachability_start = std::chrono::high_resolution_clock::now();
+
 
 
     // neither does this!   
@@ -52,16 +57,17 @@ void run(DeviceGraph g, csc485b::a2::edge_t const* d_edges, std::size_t m)
     auto const end = std::chrono::high_resolution_clock::now();
 
     
+
     std::cout << "Build time: "
         << std::chrono::duration_cast<std::chrono::microseconds>(reachability_start - build_start).count()
         << " us"
         << std::endl;
-    
+
     std::cout << "Reachability time: "
         << std::chrono::duration_cast<std::chrono::microseconds>(end - reachability_start).count()
         << " us"
         << std::endl;
-    
+
 }
 
 /**
@@ -107,18 +113,35 @@ void run_sparse(csc485b::a2::edge_t const* d_edges, std::size_t n, std::size_t m
     cudaFree(d_neighbours);
     cudaFree(d_offsets);
 }
->>>>>>> Stashed changes
+
 
 int main()
 {
-    std::size_t const n = 32*32;
-    std::size_t const switch_at = 3 * (n >> 2);
+    using namespace csc485b;
 
-<<<<<<< Updated upstream
+    // Create input
+    std::size_t constexpr n = 8;
+    std::size_t constexpr expected_degree = n >> 1;
+
+    a2::edge_list_t const graph = a2::generate_graph(n, n * expected_degree);
+    std::size_t const m = graph.size();
+
+    // lazily echo out input graph
+    for (auto const& e : graph)
+    {
+        std::cout << "(" << e.x << "," << e.y << ") ";
+    }
+
+    // allocate and memcpy input to device
+    a2::edge_t* d_edges;
+    cudaMalloc((void**)&d_edges, sizeof(a2::edge_t) * m);
+    cudaMemcpyAsync(d_edges, graph.data(), sizeof(a2::edge_t) * m, cudaMemcpyHostToDevice);
+
+
     auto data = csc485b::a1::generate_uniform< element_t >(n);
     csc485b::a1::cpu::run_cpu_baseline(data, switch_at, n);
     csc485b::a1::gpu::run_gpu_soln(data, switch_at, n);
-=======
+  
     // Create input
     std::size_t constexpr n = 4;
     std::size_t constexpr expected_degree = n >> 1;
@@ -139,9 +162,8 @@ int main()
 
     // run your code!
     run_dense(d_edges, n, m);
-   // run_sparse(d_edges, n, m);
->>>>>>> Stashed changes
+    run_sparse(d_edges, n, m);
 
-    std::cout << "hello world!" << std::endl;
+
     return EXIT_SUCCESS;
 }

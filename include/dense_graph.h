@@ -30,11 +30,13 @@ namespace csc485b {
              * @pre The pointers in DenseGraph g have already been allocated.
              */
             __global__
-                void build_graph(DenseGraph g, std::size_t m)
+                void build_graph(DenseGraph g, edge_t const* edge_list, std::size_t m)
+
             {
                 // IMPLEMENT ME!
                 return;
             }
+
 
             __device__
                 void matrix_mult(int *adj_mat, int n) {
@@ -85,8 +87,8 @@ namespace csc485b {
             __global__
                 void two_hop_reachability(DenseGraph g)
             {
-
                 matrix_mult(g.adjacencyMatrix, g.n);
+
                 // IMPLEMENT ME!
                 // square adjacencyMatrix
                 // then remove the diagonal and clamp values back to [0,1]

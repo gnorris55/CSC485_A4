@@ -2,3 +2,4 @@ out/
 .vs/
 demo/*/.vs
 demo/*/out
+./test_data.txt

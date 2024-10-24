@@ -8,7 +8,6 @@ check_language(CUDA)
 
 
 set(SOURCES "./src/main.cu")
-list(APPEND SOURCES "./src/cpu_baseline.cu" "./src/gpu_solution.cu")
 
 # Create an executable with all appended source files
 

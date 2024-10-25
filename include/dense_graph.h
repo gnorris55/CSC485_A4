@@ -30,9 +30,20 @@ namespace csc485b {
              * @pre The pointers in DenseGraph g have already been allocated.
              */
             __global__
-                void build_graph(DenseGraph g, std::size_t m)
+            void build_graph(DenseGraph g, edge_t const * edge_list, std::size_t m)
             {
-                // IMPLEMENT ME!
+                // Get thread ID
+                const int thread_id = blockIdx.x * blockDim.x + threadIdx.x;
+
+                if (thread_id < m) {
+
+                    // Edges associate to DenseGraph via indices (Row, Column)
+                    // Given edge (A, B), get flat index by formula: idx = n(A)+B
+                    std::size_t graph_index = g.n * edge_list[thread_id].x + edge_list[thread_id].y;
+
+                    // Set dense graph bit
+                    g.adjacencyMatrix[graph_index] = 1;
+                }
                 return;
             }
 

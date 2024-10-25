@@ -35,7 +35,7 @@ void run(DeviceGraph g, csc485b::a2::edge_t const* d_edges, std::size_t m)
     auto const build_start = std::chrono::high_resolution_clock::now();
 
     // this code doesn't work yet!
-    //csc485b::a2::gpu::build_graph << < 1, 1 >> > (g, d_edges, m);
+    csc485b::a2::gpu::build_graph << < 1, 1024 >> > (g, d_edges, m);
 
     cudaDeviceSynchronize();
     auto const reachability_start = std::chrono::high_resolution_clock::now();
@@ -52,7 +52,8 @@ void run(DeviceGraph g, csc485b::a2::edge_t const* d_edges, std::size_t m)
     auto const end = std::chrono::high_resolution_clock::now();
 
 
-    std::cout << "Build time: "
+    std::cout << std::endl
+        << "Build time: "
         << std::chrono::duration_cast<std::chrono::microseconds>(reachability_start - build_start).count()
         << " us"
         << std::endl;

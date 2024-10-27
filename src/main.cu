@@ -42,8 +42,8 @@ void run(DeviceGraph g, csc485b::a2::edge_t const* d_edges, std::size_t m)
 
 
     // neither does this!   
-    unsigned int tiling_size = 2;
-    unsigned int matrix_size = sqrt(g.n);
+    unsigned int tiling_size = std::min(32, (int)g.n);
+    unsigned int matrix_size = g.n;
     unsigned int num_block = matrix_size / tiling_size;
     csc485b::a2::gpu::two_hop_reachability << < {num_block, num_block}, { tiling_size, tiling_size } >> > (g);
 
@@ -84,7 +84,7 @@ void run_dense(csc485b::a2::edge_t const* d_edges, std::size_t n, std::size_t m)
     a2::DenseGraph dg{ n, host_matrix.data() };
     cudaMemcpy(dg.adjacencyMatrix, d_dg.adjacencyMatrix, sizeof(a2::node_t) * d_dg.matrix_size(), cudaMemcpyDeviceToHost);
     std::copy(host_matrix.cbegin(), host_matrix.cend(), std::ostream_iterator< a2::node_t >(std::cout, " "));
-
+    print_matrix(dg.adjacencyMatrix, n, n);
     // clean up
     cudaFree(d_matrix);
 }

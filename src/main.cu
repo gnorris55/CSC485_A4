@@ -45,7 +45,10 @@ void run(DeviceGraph g, csc485b::a2::edge_t const* d_edges, std::size_t m)
     unsigned int tiling_size = std::min(32, (int)g.n);
     unsigned int matrix_size = g.n;
     unsigned int num_block = matrix_size / tiling_size;
-    csc485b::a2::gpu::two_hop_reachability << < {num_block, num_block}, { tiling_size, tiling_size } >> > (g);
+    std::cout << "tiling size: " << tiling_size << std::endl;
+    std::cout << "matrix size: " << matrix_size << std::endl;
+
+    csc485b::a2::gpu::two_hop_reachability << < {matrix_size, matrix_size}, { tiling_size, tiling_size } >> > (g);
 
 
     cudaDeviceSynchronize();
@@ -83,8 +86,9 @@ void run_dense(csc485b::a2::edge_t const* d_edges, std::size_t n, std::size_t m)
     std::vector< a2::node_t > host_matrix(d_dg.matrix_size());
     a2::DenseGraph dg{ n, host_matrix.data() };
     cudaMemcpy(dg.adjacencyMatrix, d_dg.adjacencyMatrix, sizeof(a2::node_t) * d_dg.matrix_size(), cudaMemcpyDeviceToHost);
-    std::copy(host_matrix.cbegin(), host_matrix.cend(), std::ostream_iterator< a2::node_t >(std::cout, " "));
-    print_matrix(dg.adjacencyMatrix, n, n);
+    //std::copy(host_matrix.cbegin(), host_matrix.cend(), std::ostream_iterator< a2::node_t >(std::cout, " "));
+    //std::cout << "\n";
+    //print_matrix(dg.adjacencyMatrix, n, n);
     // clean up
     cudaFree(d_matrix);
 }
@@ -114,17 +118,19 @@ int main()
     using namespace csc485b;
 
     // Create input
-    std::size_t constexpr n = 4;
-    std::size_t constexpr expected_degree = n >> 1;
+    std::size_t constexpr n = 32;
+    std::size_t constexpr expected_degree = n >> 4;
 
     a2::edge_list_t const graph = a2::generate_graph(n, n * expected_degree);
     std::size_t const m = graph.size();
 
     // lazily echo out input graph
+    /*
     for (auto const& e : graph)
     {
         std::cout << "(" << e.x << "," << e.y << ") ";
     }
+    */
 
     // allocate and memcpy input to device
     a2::edge_t* d_edges;

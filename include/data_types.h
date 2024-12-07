@@ -1,14 +1,5 @@
-#include <iostream> // for std::ostream
-#include <vector>
+#pragma once
 
-namespace csc485b {
-	namespace a2 {
+#include <stdint.h> // uint32_t
 
-		using node_t = int;
-		using edge_t = int2;
-
-		using edge_list_t = std::vector< edge_t >;
-		using node_list_t = std::vector< node_t >;
-
-	} // namespace a2
-} // namespace csc485b
+using element_t = uint32_t;

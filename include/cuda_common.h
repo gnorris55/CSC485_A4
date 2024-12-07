@@ -1,3 +1,9 @@
+/**
+ * Standard macros that can be useful for error checking.
+ * https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__ERROR.html
+ */
+#pragma once
+
 #include <cuda.h>
 
 #define CUDA_CALL(exp)                                       \
